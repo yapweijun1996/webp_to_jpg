@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEBP to JPG Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #message {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WEBP to JPG Converter</h1>
+        <input type="file" id="fileInput" webkitdirectory multiple>
+        <button id="convertButton">Convert</button>
+        <div id="message"></div>
+    </div>
+    <script>
+        document.getElementById('convertButton').addEventListener('click', async () => {
+            const fileInput = document.getElementById('fileInput');
+            const files = Array.from(fileInput.files);
+            
+            if (files.length === 0) {
+                document.getElementById('message').innerText = "Please select a folder containing .webp files.";
+                return;
+            }
+
+            // Select all files ending with .webp
+            const webpFiles = files.filter(file => file.name.endsWith('.webp'));
+            
+            if (webpFiles.length === 0) {
+                document.getElementById('message').innerText = "No .webp files found.";
+                return;
+            }
+
+            const formData = new FormData();
+            webpFiles.forEach(file => formData.append('files', file));
+
+            document.getElementById('message').innerText = `Converting ${webpFiles.length} files...`;
+
+            const response = await fetch('/convert', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                document.getElementById('message').innerText = `Conversion complete! Files saved in folder with timestamp: ${result.timestamp}`;
+            } else {
+                document.getElementById('message').innerText = "An error occurred during conversion.";
+            }
+        });
+    </script>
+</body>
+</html>
